@@ -16,11 +16,9 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- Левая колонка: список и добавление -->
                 <DockPanel Grid.Column="0" Margin="0,0,20,0">
                     <TextBlock Text="Sõidukid" FontSize="15" FontWeight="SemiBold" Foreground="#2C3E50" Margin="0,0,0,10" DockPanel.Dock="Top"/>
 
-                    <!-- Блок создания нового транспорта снизу списка -->
                     <StackPanel DockPanel.Dock="Bottom" Margin="0,10,0,0">
                         <TextBlock Text="Uue sõiduki andmed:" FontSize="12" Foreground="#64748B" Margin="0,0,0,4"/>
                         <TextBox x:Name="NewMakeBox" Text="Mark" Margin="0,0,0,4" Height="26" VerticalContentAlignment="Center" Padding="4,0" BorderBrush="#CBD5E1"/>
@@ -39,7 +37,6 @@
                     </Border>
                 </DockPanel>
 
-                <!-- Правая колонка: действия, инфо и логи -->
                 <StackPanel Grid.Column="1">
                     <TextBlock x:Name="SelectedTitleText" Text="Vali sõiduk nimekirjast" FontSize="18" FontWeight="Bold" Foreground="#1E293B"/>
                     <TextBlock x:Name="OdometerText" Text="Läbisõit: -" FontSize="14" Foreground="#64748B" Margin="0,4,0,16"/>
