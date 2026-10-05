@@ -129,6 +129,9 @@
   <data name="ErrModelEmpty" xml:space="preserve">
     <value>Mudel ei tohi olla tühi.</value>
   </data>
+  <data name="ErrNoSelection" xml:space="preserve">
+    <value>Vali esmalt sõiduk!</value>
+  </data>
   <data name="ErrOdoNegative" xml:space="preserve">
     <value>Läbisõit ei saa olla negatiivne.</value>
   </data>
@@ -158,6 +161,15 @@
   </data>
   <data name="LogCarDrive" xml:space="preserve">
     <value>{0} sõitis {1} km. Läbisõit: {2} km.</value>
+  </data>
+  <data name="LogFlash" xml:space="preserve">
+    <value>{0} vilgutab tulesid!</value>
+  </data>
+  <data name="LogHonk" xml:space="preserve">
+    <value>{0} annab signaali: Tuut-tuut!</value>
+  </data>
+  <data name="LogMoveResult" xml:space="preserve">
+    <value>{0} liikus {1} km. Läbisõit: {2} km.</value>
   </data>
   <data name="OdometerEmpty" xml:space="preserve">
     <value>Läbisõit: -</value>

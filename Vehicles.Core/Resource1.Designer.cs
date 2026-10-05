@@ -97,6 +97,15 @@ namespace Vehicles.Core {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Vali esmalt sõiduk!.
+        /// </summary>
+        public static string ErrNoSelection {
+            get {
+                return ResourceManager.GetString("ErrNoSelection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Läbisõit ei saa olla negatiivne..
         /// </summary>
         public static string ErrOdoNegative {
@@ -183,6 +192,33 @@ namespace Vehicles.Core {
         public static string LogCarDrive {
             get {
                 return ResourceManager.GetString("LogCarDrive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} vilgutab tulesid!.
+        /// </summary>
+        public static string LogFlash {
+            get {
+                return ResourceManager.GetString("LogFlash", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} annab signaali: Tuut-tuut!.
+        /// </summary>
+        public static string LogHonk {
+            get {
+                return ResourceManager.GetString("LogHonk", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} liikus {1} km. Läbisõit: {2} km..
+        /// </summary>
+        public static string LogMoveResult {
+            get {
+                return ResourceManager.GetString("LogMoveResult", resourceCulture);
             }
         }
         

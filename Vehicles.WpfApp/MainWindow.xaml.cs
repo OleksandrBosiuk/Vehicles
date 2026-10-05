@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,21 +8,29 @@ namespace Vehicles.WpfApp;
 
 public partial class MainWindow : Window
 {
-    public ObservableCollection<Vehicle> Vehicles { get; } = new();
+    public Garage<Vehicle> CarGarage { get; } = new("Autode garaaž");
+    public Garage<Vehicle> BoatGarage { get; } = new("Paatide garaaž");
+
+    private Vehicle? selectedVehicle;
 
     public MainWindow()
     {
         InitializeComponent();
-        VehiclesListBox.ItemsSource = Vehicles;
 
-        Vehicles.Add(new Car("Volvo", "V60", 0));
-        Vehicles.Add(new Boat("Bella", "600", 0));
-        Vehicles.Add(new AmphibiousCar("Amphi", "X", 0));
+        CarGarage.LogAction += AddToLog;
+        BoatGarage.LogAction += AddToLog;
 
-        VehiclesListBox.SelectedIndex = 0;
+        CarGarageBox.ItemsSource = CarGarage.Vehicles;
+        BoatGarageBox.ItemsSource = BoatGarage.Vehicles;
+
+        CarGarage.Add(new Car("Volvo", "V60", 120));
+        CarGarage.Add(new Car("Audi", "A6", 50));
+
+        BoatGarage.Add(new Boat("Bella", "600", 45));
+        BoatGarage.Add(new AmphibiousCar("Amphi", "X", 10));
+
+        CarGarageBox.SelectedIndex = 0;
     }
-
-    private Vehicle? SelectedVehicle => VehiclesListBox.SelectedItem as Vehicle;
 
     private double ReadDistance()
     {
@@ -45,32 +52,63 @@ public partial class MainWindow : Window
 
     private void UpdateDetails()
     {
-        if (SelectedVehicle == null)
+        if (selectedVehicle == null)
         {
             SelectedTitleText.Text = Resource1.DefaultSelectPrompt;
             OdometerText.Text = Resource1.OdometerEmpty;
+            MoveButton.IsEnabled = false;
             DriveButton.IsEnabled = false;
             SwimButton.IsEnabled = false;
-            RemoveButton.IsEnabled = false;
             return;
         }
 
-        SelectedTitleText.Text = string.Format(Resource1.SelectedFormat, SelectedVehicle.Make, SelectedVehicle.Model);
-        OdometerText.Text = string.Format(Resource1.OdometerFormat, SelectedVehicle.Odometer);
+        SelectedTitleText.Text = string.Format(Resource1.SelectedFormat, selectedVehicle.Make, selectedVehicle.Model);
+        OdometerText.Text = string.Format(Resource1.OdometerFormat, selectedVehicle.Odometer);
 
-        DriveButton.IsEnabled = SelectedVehicle is IDriveable;
-        SwimButton.IsEnabled = SelectedVehicle is ISwimmable;
-        RemoveButton.IsEnabled = true;
+        MoveButton.IsEnabled = true;
+        DriveButton.IsEnabled = selectedVehicle is IDriveable;
+        SwimButton.IsEnabled = selectedVehicle is ISwimmable;
     }
 
-    private void VehiclesListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void CarGarageBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        UpdateDetails();
+        if (CarGarageBox.SelectedItem is Vehicle v)
+        {
+            selectedVehicle = v;
+            BoatGarageBox.SelectedIndex = -1;
+            UpdateDetails();
+        }
+    }
+
+    private void BoatGarageBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (BoatGarageBox.SelectedItem is Vehicle v)
+        {
+            selectedVehicle = v;
+            CarGarageBox.SelectedIndex = -1;
+            UpdateDetails();
+        }
+    }
+
+    private void Move_Click(object sender, RoutedEventArgs e)
+    {
+        if (selectedVehicle == null) return;
+        try
+        {
+            double km = ReadDistance();
+            string msg = selectedVehicle.Move(km);
+            AddToLog(msg);
+            UpdateDetails();
+        }
+        catch (ArgumentException ex)
+        {
+            MessageBox.Show(ex.Message, Resource1.ErrorTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
 
     private void Drive_Click(object sender, RoutedEventArgs e)
     {
-        if (SelectedVehicle is IDriveable driver)
+        if (selectedVehicle is IDriveable driver)
         {
             try
             {
@@ -88,7 +126,7 @@ public partial class MainWindow : Window
 
     private void Swim_Click(object sender, RoutedEventArgs e)
     {
-        if (SelectedVehicle is ISwimmable swimmer)
+        if (selectedVehicle is ISwimmable swimmer)
         {
             try
             {
@@ -104,56 +142,55 @@ public partial class MainWindow : Window
         }
     }
 
-    private void Remove_Click(object sender, RoutedEventArgs e)
+    private void AddCarToCarGarage_Click(object sender, RoutedEventArgs e)
     {
-        if (SelectedVehicle != null)
+        var car = new Car("BMW", $"Serie {CarGarage.Vehicles.Count + 1}");
+        AddToLog(string.Format(Resource1.LogAddedCar, car));
+        CarGarage.Add(car);
+        CarGarageBox.SelectedItem = car;
+    }
+
+    private void AddAmphiToCarGarage_Click(object sender, RoutedEventArgs e)
+    {
+        var amphi = new AmphibiousCar("Gibbs", $"Quad {CarGarage.Vehicles.Count + 1}");
+        AddToLog(string.Format(Resource1.LogAddedAmphi, amphi));
+        CarGarage.Add(amphi);
+        CarGarageBox.SelectedItem = amphi;
+    }
+
+    private void RemoveCarGarage_Click(object sender, RoutedEventArgs e)
+    {
+        if (CarGarageBox.SelectedItem is Vehicle v)
         {
-            Vehicles.Remove(SelectedVehicle);
+            CarGarage.Remove(v);
+            selectedVehicle = null;
+            UpdateDetails();
         }
     }
 
-    private void AddCar_Click(object sender, RoutedEventArgs e)
+    private void AddBoatToBoatGarage_Click(object sender, RoutedEventArgs e)
     {
-        try
-        {
-            var car = new Car(NewMakeBox.Text, NewModelBox.Text);
-            Vehicles.Add(car);
-            VehiclesListBox.SelectedItem = car;
-            AddToLog(string.Format(Resource1.LogAddedCar, car));
-        }
-        catch (ArgumentException ex)
-        {
-            MessageBox.Show(ex.Message, Resource1.ErrorTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
-        }
+        var boat = new Boat("Yamaha", $"Cruiser {BoatGarage.Vehicles.Count + 1}");
+        AddToLog(string.Format(Resource1.LogAddedBoat, boat));
+        BoatGarage.Add(boat);
+        BoatGarageBox.SelectedItem = boat;
     }
 
-    private void AddBoat_Click(object sender, RoutedEventArgs e)
+    private void AddAmphiToBoatGarage_Click(object sender, RoutedEventArgs e)
     {
-        try
-        {
-            var boat = new Boat(NewMakeBox.Text, NewModelBox.Text);
-            Vehicles.Add(boat);
-            VehiclesListBox.SelectedItem = boat;
-            AddToLog(string.Format(Resource1.LogAddedBoat, boat));
-        }
-        catch (ArgumentException ex)
-        {
-            MessageBox.Show(ex.Message, Resource1.ErrorTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
-        }
+        var amphi = new AmphibiousCar("Amphi", $"WaterCar {BoatGarage.Vehicles.Count + 1}");
+        AddToLog(string.Format(Resource1.LogAddedAmphi, amphi));
+        BoatGarage.Add(amphi);
+        BoatGarageBox.SelectedItem = amphi;
     }
 
-    private void AddAmphibian_Click(object sender, RoutedEventArgs e)
+    private void RemoveBoatGarage_Click(object sender, RoutedEventArgs e)
     {
-        try
+        if (BoatGarageBox.SelectedItem is Vehicle v)
         {
-            var amphi = new AmphibiousCar(NewMakeBox.Text, NewModelBox.Text);
-            Vehicles.Add(amphi);
-            VehiclesListBox.SelectedItem = amphi;
-            AddToLog(string.Format(Resource1.LogAddedAmphi, amphi));
-        }
-        catch (ArgumentException ex)
-        {
-            MessageBox.Show(ex.Message, Resource1.ErrorTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+            BoatGarage.Remove(v);
+            selectedVehicle = null;
+            UpdateDetails();
         }
     }
 }

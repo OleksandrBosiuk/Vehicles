@@ -20,7 +20,19 @@ public abstract class Vehicle
         Odometer = initialOdometer;
     }
 
-    public abstract string Move(double km);
+    public virtual string Move(double km)
+    {
+        if (km <= 0)
+            throw new ArgumentException(Resource1.ErrDistanceInvalid);
+
+        Odometer += km;
+        return string.Format(Resource1.LogMoveResult, ToString(), km, Odometer);
+    }
+
+    public virtual string Honk() => string.Format(Resource1.LogHonk, ToString());
+
+    public virtual string FlashLights() => string.Format(Resource1.LogFlash, ToString());
 
     public override string ToString() => $"{Make} {Model}";
 }
+
